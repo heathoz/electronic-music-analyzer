@@ -1,3 +1,33 @@
+/*
+🚀 GOOGLE ANALYTICS 4 SETUP - READY TO DEPLOY!
+
+✅ GA4 Measurement ID: G-C4N2ZXFB2C (configured)
+✅ All event tracking implemented
+✅ Ready for Vercel deployment
+
+📊 EVENTS BEING TRACKED:
+- page_view: Initial landing with device type
+- sample_track_selected: Which tracks users click
+- track_analysis_started: Analysis button clicks
+- track_analysis_completed: Successful analyses
+- track_analysis_failed: Failed attempts
+- tab_switch: Analyzer vs About tab usage
+- email_capture_attempted: Email form submissions
+- email_capture_completed: Successful conversions
+- share_analysis: Social sharing by platform
+- analysis_viewed: When users view analysis results
+- analysis_engagement: Time spent reading analysis
+
+💡 INSIGHTS YOU'LL GET:
+- Most popular tracks (optimize content)
+- Mobile vs desktop usage (optimize UX)
+- Conversion rates (email capture performance)
+- Engagement time (content quality metrics)
+- User journey patterns (improve flow)
+
+🔄 Next: Push to GitHub → Deploy to Vercel → Watch the data flow!
+*/
+
 import { useState, useRef, useEffect } from 'react';
 import { Music, Play, Heart, Youtube, Instagram, Sparkles, Mail, Share2, Linkedin, Copy } from 'lucide-react';
 
@@ -12,6 +42,55 @@ export default function ElectronicMusicAnalyzer() {
   const [userEmail, setUserEmail] = useState('');
   const [isSubmittingEmail, setIsSubmittingEmail] = useState(false);
   const carouselRef = useRef(null);
+
+  // Optimize analytics loading - only load when needed
+  useEffect(() => {
+    // Add Google Analytics 4 - Only in production
+    if (typeof window === 'undefined' || window.location.hostname === 'localhost') return;
+    
+    const GA_MEASUREMENT_ID = 'G-C4N2ZXFB2C'; // Your actual GA4 Measurement ID
+    
+    // Load gtag script
+    const script1 = document.createElement('script');
+    script1.async = true;
+    script1.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+    document.head.appendChild(script1);
+    
+    // Initialize gtag
+    const script2 = document.createElement('script');
+    script2.innerHTML = `
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '${GA_MEASUREMENT_ID}', {
+        page_title: 'Electronic Music Track Analyzer',
+        custom_map: {
+          'custom_parameter_1': 'track_analyzed',
+          'custom_parameter_2': 'user_type'
+        }
+      });
+    `;
+    document.head.appendChild(script2);
+    
+    // Track initial page view with device info
+    const deviceType = window.innerWidth <= 768 ? 'mobile' : 'desktop';
+    // GA will be available after script loads
+    setTimeout(() => {
+      if (window.gtag) {
+        window.gtag('event', 'page_view', {
+          page_title: 'Electronic Music Analyzer Landing',
+          device_type: deviceType,
+          page_location: window.location.href
+        });
+      }
+    }, 1000);
+    
+    return () => {
+      // Cleanup scripts on unmount
+      const scripts = document.querySelectorAll('script[src*="googletagmanager"]');
+      scripts.forEach(script => script.remove());
+    };
+  }, []);
 
   // Add structured data for SEO
   useEffect(() => {
@@ -95,6 +174,33 @@ export default function ElectronicMusicAnalyzer() {
       if (script) script.remove();
     };
   }, []);
+
+  // Track analysis engagement time
+  useEffect(() => {
+    if (analysis && window.gtag) {
+      const startTime = Date.now();
+      
+      // Track when analysis is viewed
+      window.gtag('event', 'analysis_viewed', {
+        event_category: 'Content Engagement',
+        event_label: `${analysis.artist} - ${analysis.title}`,
+        engagement_time_msec: 1
+      });
+      
+      // Track engagement time when component unmounts or analysis changes
+      return () => {
+        const engagementTime = Math.round((Date.now() - startTime) / 1000);
+        if (engagementTime > 5) { // Only track if engaged for more than 5 seconds
+          window.gtag('event', 'analysis_engagement', {
+            event_category: 'Content Engagement',
+            event_label: `${analysis.artist} - ${analysis.title}`,
+            value: engagementTime,
+            engagement_time_msec: engagementTime * 1000
+          });
+        }
+      };
+    }
+  }, [analysis]);
 
   // Add horizontal scroll with mouse wheel
   useEffect(() => {
@@ -242,15 +348,45 @@ export default function ElectronicMusicAnalyzer() {
     setError('');
     setAnalysis(null);
 
+    // Track analysis attempt
+    if (window.gtag) {
+      window.gtag('event', 'track_analysis_started', {
+        event_category: 'User Interaction',
+        event_label: youtubeUrl,
+        video_id: videoId
+      });
+    }
+
     setTimeout(() => {
       const normalizedUrl = normalizeUrl(youtubeUrl);
       const analysisResult = sampleAnalyses[normalizedUrl];
       
       if (analysisResult) {
         setAnalysis(analysisResult);
+        
+        // Track successful analysis
+        if (window.gtag) {
+          window.gtag('event', 'track_analysis_completed', {
+            event_category: 'Content Engagement',
+            event_label: `${analysisResult.artist} - ${analysisResult.title}`,
+            track_artist: analysisResult.artist,
+            track_title: analysisResult.title,
+            custom_parameter_1: `${analysisResult.artist} - ${analysisResult.title}`
+          });
+        }
+        
         setTimeout(() => setShowEmailCapture(true), 1000);
       } else {
         setError('This demo includes sample analyses for selected electronic tracks. Try one of the sample tracks below!');
+        
+        // Track failed analysis
+        if (window.gtag) {
+          window.gtag('event', 'track_analysis_failed', {
+            event_category: 'User Interaction',
+            event_label: 'Unknown track',
+            reason: 'track_not_in_database'
+          });
+        }
       }
       setIsLoading(false);
     }, 2000);
@@ -259,6 +395,18 @@ export default function ElectronicMusicAnalyzer() {
   const loadSampleTrack = (url) => {
     setYoutubeUrl(url);
     setError('');
+    
+    // Track sample track selection
+    const trackInfo = sampleAnalyses[url];
+    if (window.gtag && trackInfo) {
+      window.gtag('event', 'sample_track_selected', {
+        event_category: 'User Interaction',
+        event_label: `${trackInfo.artist} - ${trackInfo.title}`,
+        track_artist: trackInfo.artist,
+        track_title: trackInfo.title,
+        track_url: url
+      });
+    }
   };
 
   // SIMPLE BUTTON CLICK EMAIL SUBMIT - NO FORM ELEMENTS
@@ -277,6 +425,15 @@ export default function ElectronicMusicAnalyzer() {
     if (!emailRegex.test(userEmail)) {
       alert('Please enter a valid email address');
       return;
+    }
+    
+    // Track email capture attempt
+    if (window.gtag) {
+      window.gtag('event', 'email_capture_attempted', {
+        event_category: 'Conversion',
+        event_label: analysis ? `${analysis.artist} - ${analysis.title}` : 'No track analyzed',
+        custom_parameter_1: analysis ? `${analysis.artist} - ${analysis.title}` : 'none'
+      });
     }
     
     console.log('Email validation passed, creating form'); // Debug
@@ -318,6 +475,15 @@ export default function ElectronicMusicAnalyzer() {
     
     console.log('Form submitted, cleaning up'); // Debug
     
+    // Track email capture success
+    if (window.gtag) {
+      window.gtag('event', 'email_capture_completed', {
+        event_category: 'Conversion',
+        event_label: analysis ? `${analysis.artist} - ${analysis.title}` : 'No track analyzed',
+        value: 1 // Assign value for conversion tracking
+      });
+    }
+    
     // Clean up
     setTimeout(() => {
       if (document.body.contains(submitForm)) {
@@ -338,6 +504,16 @@ export default function ElectronicMusicAnalyzer() {
     const currentUrl = window.location.href;
     const trackTitle = analysis ? `${analysis.artist} - ${analysis.title}` : 'This Electronic Track';
     const shareText = `Just discovered the production secrets behind ${trackTitle} using this amazing AI analyzer!`;
+    
+    // Track share button clicks
+    if (window.gtag) {
+      window.gtag('event', 'share_analysis', {
+        event_category: 'User Interaction',
+        event_label: platform,
+        track_analyzed: analysis ? `${analysis.artist} - ${analysis.title}` : 'none',
+        share_platform: platform
+      });
+    }
     
     const shareUrls = {
       reddit: `https://reddit.com/submit?title=${encodeURIComponent(shareText)}&url=${encodeURIComponent(currentUrl)}`,
@@ -367,7 +543,17 @@ export default function ElectronicMusicAnalyzer() {
           <nav className="flex justify-center mb-6 md:mb-8 px-4" role="navigation" aria-label="Main navigation">
             <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-1 border border-slate-700 w-full max-w-sm">
               <button
-                onClick={() => setActiveTab('analyzer')}
+                onClick={() => {
+                  setActiveTab('analyzer');
+                  // Track tab switch
+                  if (window.gtag) {
+                    window.gtag('event', 'tab_switch', {
+                      event_category: 'User Interface',
+                      event_label: 'analyzer_tab',
+                      previous_tab: activeTab
+                    });
+                  }
+                }}
                 className={`w-1/2 py-3 px-4 rounded-lg font-medium transition-all text-sm md:text-base ${
                   activeTab === 'analyzer'
                     ? 'bg-cyan-500 text-white shadow-lg'
@@ -379,7 +565,17 @@ export default function ElectronicMusicAnalyzer() {
                 Analyzer
               </button>
               <button
-                onClick={() => setActiveTab('about')}
+                onClick={() => {
+                  setActiveTab('about');
+                  // Track tab switch
+                  if (window.gtag) {
+                    window.gtag('event', 'tab_switch', {
+                      event_category: 'User Interface',
+                      event_label: 'about_tab',
+                      previous_tab: activeTab
+                    });
+                  }
+                }}
                 className={`w-1/2 py-3 px-4 rounded-lg font-medium transition-all text-sm md:text-base ${
                   activeTab === 'about'
                     ? 'bg-cyan-500 text-white shadow-lg'
