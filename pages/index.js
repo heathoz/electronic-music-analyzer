@@ -1,54 +1,19 @@
-/*
-🚀 GOOGLE ANALYTICS 4 SETUP - READY TO DEPLOY!
-
-✅ GA4 Measurement ID: G-C4N2ZXFB2C (configured)
-✅ All event tracking implemented
-✅ Ready for Vercel deployment
-
-📊 EVENTS BEING TRACKED:
-- page_view: Initial landing with device type
-- sample_track_selected: Which tracks users click
-- track_analysis_started: Analysis button clicks
-- track_analysis_completed: Successful analyses
-- track_analysis_failed: Failed attempts
-- tab_switch: Analyzer vs About tab usage
-- email_capture_attempted: Email form submissions
-- email_capture_completed: Successful conversions
-- share_analysis: Social sharing by platform
-- analysis_viewed: When users view analysis results
-- analysis_engagement: Time spent reading analysis
-
-💡 INSIGHTS YOU'LL GET:
-- Most popular tracks (optimize content)
-- Mobile vs desktop usage (optimize UX)
-- Conversion rates (email capture performance)
-- Engagement time (content quality metrics)
-- User journey patterns (improve flow)
-
-🔄 Next: Push to GitHub → Deploy to Vercel → Watch the data flow!
-*/
-
 import { useState, useRef, useEffect } from 'react';
-import { Music, Play, Heart, Youtube, Instagram, Sparkles, Mail, Share2, Linkedin, Copy } from 'lucide-react';
+import { Music, Play, Heart, Youtube, Instagram, Sparkles, Share2, Linkedin, Copy } from 'lucide-react';
 
 export default function ElectronicMusicAnalyzer() {
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [analysis, setAnalysis] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showEmailCapture, setShowEmailCapture] = useState(false);
-  const [emailSubmitted, setEmailSubmitted] = useState(false);
   const [activeTab, setActiveTab] = useState('analyzer');
-  const [userEmail, setUserEmail] = useState('');
-  const [isSubmittingEmail, setIsSubmittingEmail] = useState(false);
   const carouselRef = useRef(null);
 
-  // Optimize analytics loading - only load when needed
+  // Google Analytics 4 Setup - Production Only
   useEffect(() => {
-    // Add Google Analytics 4 - Only in production
     if (typeof window === 'undefined' || window.location.hostname === 'localhost') return;
     
-    const GA_MEASUREMENT_ID = 'G-C4N2ZXFB2C'; // Your actual GA4 Measurement ID
+    const GA_MEASUREMENT_ID = 'G-C4N2ZXFB2C';
     
     // Load gtag script
     const script1 = document.createElement('script');
@@ -65,16 +30,14 @@ export default function ElectronicMusicAnalyzer() {
       gtag('config', '${GA_MEASUREMENT_ID}', {
         page_title: 'Electronic Music Track Analyzer',
         custom_map: {
-          'custom_parameter_1': 'track_analyzed',
-          'custom_parameter_2': 'user_type'
+          'custom_parameter_1': 'track_analyzed'
         }
       });
     `;
     document.head.appendChild(script2);
     
-    // Track initial page view with device info
+    // Track initial page view
     const deviceType = window.innerWidth <= 768 ? 'mobile' : 'desktop';
-    // GA will be available after script loads
     setTimeout(() => {
       if (window.gtag) {
         window.gtag('event', 'page_view', {
@@ -86,13 +49,12 @@ export default function ElectronicMusicAnalyzer() {
     }, 1000);
     
     return () => {
-      // Cleanup scripts on unmount
       const scripts = document.querySelectorAll('script[src*="googletagmanager"]');
       scripts.forEach(script => script.remove());
     };
   }, []);
 
-  // Add structured data for SEO
+  // SEO and Structured Data
   useEffect(() => {
     const structuredData = {
       "@context": "https://schema.org",
@@ -110,17 +72,11 @@ export default function ElectronicMusicAnalyzer() {
       "creator": {
         "@type": "Person",
         "name": "Heath Holme",
-        "url": "https://www.youtube.com/c/heathholme"
+        "url": "https://www.youtube.com/@HeathHolme"
       },
-      "keywords": "electronic music production, music analysis, deadmau5, daft punk, techno production, house music, music producer tools, DAW techniques, EDM production",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "5.0",
-        "ratingCount": "1"
-      }
+      "keywords": "electronic music production, music analysis, deadmau5, daft punk, techno production, house music, music producer tools, DAW techniques, EDM production"
     };
 
-    // Add structured data to page
     let script = document.getElementById('structured-data');
     if (!script) {
       script = document.createElement('script');
@@ -130,10 +86,8 @@ export default function ElectronicMusicAnalyzer() {
     }
     script.textContent = JSON.stringify(structuredData);
 
-    // Update page title and meta tags
     document.title = "Electronic Music Track Analyzer - Learn Production Secrets from the Pros";
     
-    // Update or create meta tags
     const updateMeta = (name, content) => {
       let meta = document.querySelector(`meta[name="${name}"]`) || document.querySelector(`meta[property="${name}"]`);
       if (!meta) {
@@ -160,7 +114,6 @@ export default function ElectronicMusicAnalyzer() {
     updateMeta('og:type', 'website');
     updateMeta('og:url', 'https://electronic-music-analyzer.vercel.app');
     updateMeta('og:site_name', 'Electronic Music Track Analyzer');
-    updateMeta('og:locale', 'en_US');
 
     // Twitter Card Tags
     updateMeta('twitter:card', 'summary_large_image');
@@ -169,10 +122,25 @@ export default function ElectronicMusicAnalyzer() {
     updateMeta('twitter:creator', '@heathholmemusic');
 
     return () => {
-      // Cleanup function
       const script = document.getElementById('structured-data');
       if (script) script.remove();
     };
+  }, []);
+
+  // Horizontal scroll with mouse wheel
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    if (!carousel) return;
+
+    const handleWheel = (e) => {
+      if (carousel.scrollWidth > carousel.clientWidth) {
+        e.preventDefault();
+        carousel.scrollLeft += e.deltaY;
+      }
+    };
+
+    carousel.addEventListener('wheel', handleWheel, { passive: false });
+    return () => carousel.removeEventListener('wheel', handleWheel);
   }, []);
 
   // Track analysis engagement time
@@ -180,17 +148,15 @@ export default function ElectronicMusicAnalyzer() {
     if (analysis && window.gtag) {
       const startTime = Date.now();
       
-      // Track when analysis is viewed
       window.gtag('event', 'analysis_viewed', {
         event_category: 'Content Engagement',
         event_label: `${analysis.artist} - ${analysis.title}`,
         engagement_time_msec: 1
       });
       
-      // Track engagement time when component unmounts or analysis changes
       return () => {
         const engagementTime = Math.round((Date.now() - startTime) / 1000);
-        if (engagementTime > 5) { // Only track if engaged for more than 5 seconds
+        if (engagementTime > 5) {
           window.gtag('event', 'analysis_engagement', {
             event_category: 'Content Engagement',
             event_label: `${analysis.artist} - ${analysis.title}`,
@@ -202,23 +168,6 @@ export default function ElectronicMusicAnalyzer() {
     }
   }, [analysis]);
 
-  // Add horizontal scroll with mouse wheel
-  useEffect(() => {
-    const carousel = carouselRef.current;
-    if (!carousel) return;
-
-    const handleWheel = (e) => {
-      // Only handle horizontal scrolling if there's horizontal overflow
-      if (carousel.scrollWidth > carousel.clientWidth) {
-        e.preventDefault();
-        carousel.scrollLeft += e.deltaY;
-      }
-    };
-
-    carousel.addEventListener('wheel', handleWheel, { passive: false });
-    return () => carousel.removeEventListener('wheel', handleWheel);
-  }, []);
-
   const sampleAnalyses = {
     "https://youtu.be/dwDns8x3Jb4": {
       title: "Strobe",
@@ -227,7 +176,7 @@ export default function ElectronicMusicAnalyzer() {
       
       musicalDNA: "🎵 **KEY:** F# minor at A=440Hz (the 'melancholic hope' frequency) • 🥁 **BPM:** 128.00 (perfect for trance hypnosis) • 🎹 **CHORD PROGRESSION:** F#m - D - A - E (vi-bVI-bVII-V in A major - the 'emotional journey' progression) • ⏱️ **STRUCTURE:** 32-bar phrases (matches human attention/breathing cycles) • 🎛️ **TIME SIGNATURE:** 4/4 with subtle swing on hi-hats (+3ms) • 🔊 **ROOT NOTE:** F# at 92.5Hz (sub-bass fundamental)",
       
-      abletonMasterclass: "🎛️ **ABLETON RECREATION GUIDE:**\n\n**MAIN PLUCK:** Wavetable → Modern Talking → Saw wave • Oscillator pitch: -3 cents (creates beating with bass) • **ENV 1:** Attack 47ms, Decay 1.2s, Sustain 0%, Release 2.1s • **Filter:** Lowpass Legacy, Cutoff 2.1kHz, Resonance 1.8, Drive +6dB • **LFO 1:** Rate 1/16, Amount +12 semitones to cutoff (creates movement)\n\n**SUB BASS:** Wavetable → Basic Shapes → Sine • Root note F# (92.5Hz) • **Compressor:** Ratio 4:1, Attack 10ms, Release 100ms • **Sidechain:** Ghost kick every beat, -6dB reduction\n\n**ARRANGEMENT LAYERS:**\n• **0:00-2:00:** Sub bass + minimal percussion\n• **2:00-4:30:** Add main pluck (filtered)\n• **4:30-7:00:** Layer strings pad (Wavetable → Mallets & Bells → Vintage Electric)\n• **7:00-9:30:** Full arrangement + lead melody\n• **9:30-10:32:** Breakdown and outro\n\n**PRO TIP:** Automate Utility Gain instead of track volume - preserves dynamics",
+      abletonMasterclass: "🎛️ **ABLETON RECREATION GUIDE:**\n\n**MAIN PLUCK:** Wavetable → Modern Talking → Saw wave • Oscillator pitch: -3 cents (creates beating with bass) • **ENV 1:** Attack 47ms, Decay 1.2s, Sustain 0%, Release 2.1s • **Filter:** Lowpass Legacy, Cutoff 2.1kHz, Resonance 1.8, Drive +6dB • **LFO 1:** Rate 1/16, Amount +12 semitones to cutoff (creates movement)\n\n**SUB BASS:** Wavetable → Basic Shapes → Sine • Root note F# (92.5Hz) • **Compressor or Glue Compressor:** Ratio 4:1, Attack 10ms, Release 100ms • **Sidechain:** Ghost kick every beat, -6dB reduction\n\n**ARRANGEMENT LAYERS:**\n• **0:00-2:00:** Sub bass + minimal percussion\n• **2:00-4:30:** Add main pluck (filtered)\n• **4:30-7:00:** Layer strings pad (Wavetable → Mallets & Bells → Vintage Electric)\n• **7:00-9:30:** Full arrangement + lead melody\n• **9:30-10:32:** Breakdown and outro\n\n**PRO TIP:** Automate Utility Gain instead of track volume - preserves dynamics",
       
       producerPsychology: "🧠 **WHY THIS WORKS:**\n\n**The 32-Bar Rule:** Each new element appears every 32 bars because human attention spans reset every 30-40 seconds. deadmau5 exploits this by introducing change RIGHT when your brain expects it.\n\n**The -3 Cent Secret:** Detuning the pluck -3 cents against the bass creates 'beating' at 2.8Hz - the same frequency as deep breathing. This subconsciously syncs listeners' nervous systems to the track.\n\n**Filter Automation Psychology:** The slow filter sweep from 800Hz to 8kHz over 64 bars creates physical tension in your chest (low frequencies = relaxation, high frequencies = excitement). The release feels like emotional catharsis.\n\n**Minimalism Strategy:** Starting with almost nothing forces 'active listening' - your brain works harder to find patterns, creating deeper engagement than busy arrangements.",
       
@@ -240,7 +189,7 @@ export default function ElectronicMusicAnalyzer() {
       
       musicalDNA: "🎵 **KEY:** F# minor at A=440Hz (melancholic but danceable) • 🥁 **BPM:** 121.00 (the 'French house sweet spot' - slower than techno, groovier than deep house) • 🎹 **CHORD PROGRESSION:** F#m - A - E - B (i-bIII-bVII-IV - the 'endless loop' progression) • 🎤 **VOCAL:** 4-syllable phrase 'A-round-the-World' (2.64 seconds = perfect loop length) • ⏱️ **PHRASE LENGTH:** 8 bars exactly (matches human breathing cycle) • 🔊 **BASS FUNDAMENTAL:** F# at 92.5Hz (same as Strobe - deadmau5 studied this!) • 🎛️ **FILTER SWEEP:** 32-bar cycles (200Hz to 12kHz and back)",
       
-      abletonMasterclass: "🎛️ **ABLETON RECREATION GUIDE:**\n\n**THE VOCAL CHOP:** Audio track → Record/import 'Around the World' phrase → Crop to exactly 2 bars → **Simpler:** Classic mode, Snap to zero-crossings ON • **Audio Effects:** EQ Eight (High-pass 150Hz, Low-pass 8kHz) → Auto Filter → Compressor\n\n**BASS LINE:** **Wavetable:** Basic Shapes → Sine wave • Root note F# (92.5Hz) • **Filter:** Lowpass 24dB, Cutoff 400Hz, Drive +9dB • **Compressor:** Ratio 6:1, Attack 3ms, Release 50ms • **Sidechain:** Chain to kick drum (-4dB reduction)\n\n**THE MAGIC FILTER:** **Auto Filter** on vocal track • **Type:** Lowpass Legacy • **Frequency:** Automate 200Hz to 12kHz over 32 bars • **Resonance:** 2.1 (the 'French house resonance') • **Drive:** +6dB • **LFO:** OFF (manual automation only)\n\n**DRUM GROOVE:** **Drum Rack:** Kick on 1 and 3 (909 sample), Open hat on 2 and 4 • **Groove:** Swing 16% • **Kick processing:** EQ (boost 60Hz +3dB, cut 400Hz -2dB) • **Hat processing:** High-pass 8kHz, reverb send 15%\n\n**ARRANGEMENT SECRET:** Never stop the vocal loop - only filter it. Loop stays hypnotic, filters create 'fake' breakdowns",
+      abletonMasterclass: "🎛️ **ABLETON RECREATION GUIDE:**\n\n**THE VOCAL CHOP:** Audio track → Record/import 'Around the World' phrase → Crop to exactly 2 bars → **Simpler:** Classic mode, Snap to zero-crossings ON • **Audio Effects:** EQ Eight (High-pass 150Hz, Low-pass 8kHz) → Auto Filter → **Compressor or Glue Compressor**\n\n**BASS LINE:** **Wavetable:** Basic Shapes → Sine wave • Root note F# (92.5Hz) • **Filter:** Lowpass 24dB, Cutoff 400Hz, Drive +9dB • **Compressor or Glue Compressor:** Ratio 6:1, Attack 3ms, Release 50ms • **Sidechain:** Chain to kick drum (-4dB reduction)\n\n**THE MAGIC FILTER:** **Auto Filter** on vocal track • **Type:** Lowpass Legacy • **Frequency:** Automate 200Hz to 12kHz over 32 bars • **Resonance:** 2.1 (the 'French house resonance') • **Drive:** +6dB • **LFO:** OFF (manual automation only)\n\n**DRUM GROOVE:** **Drum Rack:** Four-on-the-floor kick pattern (909 sample on every beat), Open hat on 2 and 4 • **Groove:** Swing 16% • **Kick processing:** EQ (boost 60Hz +3dB, cut 400Hz -2dB) • **Hat processing:** High-pass 8kHz, reverb send 15%\n\n**ARRANGEMENT SECRET:** Never stop the vocal loop - only filter it. Loop stays hypnotic, filters create 'fake' breakdowns",
       
       producerPsychology: "🧠 **THE NEUROSCIENCE OF HYPNOSIS:**\n\n**The 4-Word Formula:** 'Around the World' = 4 syllables = perfect for human pattern recognition. Your brain can hold 4±1 items in working memory. More syllables = cognitive overload. Fewer = too simple. Four = hypnotic sweet spot.\n\n**32-Bar Filter Cycles:** Match human attention renewal. Every 30-35 seconds, your brain needs 'something new' or it loses focus. The filter sweep provides just enough change to reset attention without breaking the trance.\n\n**The Repetition Paradox:** Instead of becoming boring, extreme repetition triggers 'semantic satiation' - words lose meaning and become pure rhythm. Your brain shifts from language processing to pure pattern recognition = deeper trance state.\n\n**Filter Frequency Psychology:** Low frequencies (200-800Hz) = relaxation, body movement. High frequencies (4-12kHz) = excitement, mental stimulation. The sweep from low to high literally guides your nervous system from calm to energized and back.\n\n**Why It Never Gets Old:** The vocal phrase is rhythmically asymmetrical against the 4/4 beat, creating infinite micro-variations that keep your brain engaged. Same words, endless rhythmic possibilities.",
       
@@ -266,7 +215,7 @@ export default function ElectronicMusicAnalyzer() {
       
       musicalDNA: "🎵 **KEY:** D minor at A=432Hz (tuned down 32 cents for 'healing frequency' warmth) • 🥁 **BPM:** 122.00 (downtempo sweet spot - fast enough to groove, slow enough to breathe) • 🎹 **CHORD PROGRESSION:** Dm - Bb - F - C (i-bVI-bIII-bVII - the 'cinematic sadness' progression) • 🎼 **ORGANIC LAYERS:** Live recorded strings, found-sound textures, field recordings • ⏱️ **ARRANGEMENT:** 6-8 minute builds (double pop song length = deeper emotional investment) • 🔊 **FREQUENCY BALANCE:** Warm mids (400-800Hz boosted), rolled-off highs (8kHz+), present but not overwhelming bass • 🎛️ **DYNAMICS:** Breathing room - elements fade in/out like human breath patterns",
       
-      abletonMasterclass: "🎛️ **ABLETON ORGANIC SYNTHESIS GUIDE:**\n\n**THE BREATHING PAD:** **Wavetable:** Mallets & Bells → Vintage Electric • **Unison:** 4 voices, detune +/-7 cents (creates natural 'beating' like analog synths) • **Filter:** Lowpass 4-pole, cutoff 2.8kHz, resonance 0.8 • **LFO 1:** Triangle wave, rate 0.25Hz to filter cutoff (+/-200Hz) • **Envelope:** Attack 2.1s, Decay 4s, Sustain 65%, Release 3.8s (mimics string swells)\n\n**FOUND SOUND TEXTURES:** **Impulse:** Load vinyl crackle sample • **Simpler:** Vintage mode ON, pitch drift +5 cents • **Volume:** -35dB (barely audible but adds 'analog soul') • **Audio Effects:** **Saturator** (Analog Clip mode, Drive +12dB) → **EQ Eight** (High-pass 80Hz, gentle high-shelf -2dB at 8kHz)\n\n**ORGANIC DRUMS:** **Drum Rack:** Layer acoustic + electronic samples • **Kick:** 808 sub + live kick recording • **Snare:** Electronic snare + tambourine layer • **Processing:** **Compressor** (2:1 ratio, 30ms attack - slow enough to preserve transients) • **Reverb:** **Chromaverb** Hall mode, 2.1s decay, 15% wet\n\n**STRING SECTION SIMULATION:** **Operator:** Algorithm 4 (FM synthesis) • **Operator A:** Sine wave, ratio 1.00 • **Operator B:** Sine wave, ratio 2.00, level 25% • **Global:** **Chorus** device (Rate 0.8Hz, Amount 25%) → **Reverb** → **EQ** (boost 1.2kHz +2dB for presence)",
+      abletonMasterclass: "🎛️ **ABLETON ORGANIC SYNTHESIS GUIDE:**\n\n**THE BREATHING PAD:** **Wavetable:** Mallets & Bells → Vintage Electric • **Unison:** 4 voices, detune +/-7 cents (creates natural 'beating' like analog synths) • **Filter:** Lowpass 4-pole, cutoff 2.8kHz, resonance 0.8 • **LFO 1:** Triangle wave, rate 0.25Hz to filter cutoff (+/-200Hz) • **Envelope:** Attack 2.1s, Decay 4s, Sustain 65%, Release 3.8s (mimics string swells)\n\n**FOUND SOUND TEXTURES:** **Drum Rack:** Load vinyl crackle sample • **Simpler:** Vintage mode ON, pitch drift +5 cents • **Volume:** -35dB (barely audible but adds 'analog soul') • **Audio Effects:** **Saturator** (Analog Clip mode, Drive +12dB) → **EQ Eight** (High-pass 80Hz, gentle high-shelf -2dB at 8kHz)\n\n**ORGANIC DRUMS:** **Drum Rack:** Layer acoustic + electronic samples • **Kick:** 808 sub + live kick recording • **Snare:** Electronic snare + tambourine layer • **Processing:** **Compressor or Glue Compressor** (2:1 ratio, 30ms attack - slow enough to preserve transients) • **Reverb:** **Hybrid Reverb** Hall mode, 2.1s decay, 15% wet\n\n**STRING SECTION SIMULATION:** **Operator:** Algorithm 4 (FM synthesis) • **Operator A:** Sine wave, ratio 1.00 • **Operator B:** Sine wave, ratio 2.00, level 25% • **Global:** **Chorus** device (Rate 0.8Hz, Amount 25%) → **Reverb** → **EQ Eight** (boost 1.2kHz +2dB for presence)",
       
       producerPsychology: "🧠 **THE NEUROSCIENCE OF ORGANIC ELECTRONICS:**\n\n**Warm Frequency Psychology:** Humans associate 400-800Hz with vocal warmth and physical closeness. Bonobo deliberately boosts these frequencies while rolling off harsh highs (8kHz+). Your brain interprets this as 'human' rather than 'machine.'\n\n**Breathing Tempo Entrainment:** 122 BPM = 2 beats per second = perfect sync with relaxed breathing (12-20 breaths per minute). Your nervous system naturally entrains to this rhythm, creating involuntary relaxation while maintaining groove.\n\n**Imperfection as Authenticity:** The +/-7 cent detuning, vinyl crackle, and timing micro-variations trigger 'human recognition' in your brain. Perfect tuning sounds sterile; slight imperfections sound alive. This is why vintage synths feel 'warmer' than digital perfection.\n\n**Extended Arrangement Psychology:** 6-8 minute tracks allow full emotional journey: introduction (1-2 min), development (2-4 min), climax (4-6 min), resolution (6-8 min). Pop songs (3-4 min) don't allow time for deep emotional investment.\n\n**The 'Uncanny Valley' of Emotion:** Electronic music often falls into emotional uncanny valley - almost human but not quite. Bonobo bridges this by using organic textures, human timing variations, and breathing-pace builds. Result: Electronic music that feels genuinely emotional.",
       
@@ -279,7 +228,7 @@ export default function ElectronicMusicAnalyzer() {
       
       musicalDNA: "🎵 **KEY:** A minor at A=440Hz (dark but accessible) • 🥁 **BPM:** 124.00 (the tech house sweet spot - fast enough for clubs, slow enough for radio) • 🎹 **CHORD PROGRESSION:** Am - F - C - G (vi-IV-I-V - the 'pop progression' disguised as underground) • 🎤 **VOCAL CHOPS:** 2-4 word phrases, heavily processed with formant shifting • ⏱️ **GROOVE:** 16th note hi-hat rolls with 12% swing (the 'rolling' feel) • 🔊 **BASS PATTERN:** Rolling 16th notes with subtle pitch bends (+/-25 cents) • 🎛️ **ARRANGEMENT:** 32-bar loops with filter automation creating fake breakdowns • 📻 **RADIO SECRET:** Vocal hook every 16 bars (pop structure hidden in techno framework)",
       
-      abletonMasterclass: "🎛️ **ABLETON TECH HOUSE CONSTRUCTION:**\n\n**THE ROLLING BASS:** **Wavetable:** Basic Shapes → Saw wave • **Unison:** 3 voices, detune +/-12 cents • **Filter:** Lowpass 4-pole, cutoff 800Hz, resonance 1.4, drive +9dB (the 'analog warmth') • **Pitch Bend:** Automate pitch +/-25 cents on off-beats • **Compression:** Compressor (6:1 ratio, 2ms attack, auto-release) • **Sidechain:** Chain to kick (-3dB, fast attack)\n\n**VOCAL PROCESSING CHAIN:** **Audio track** → **Pitch** device (+3 semitones) → **Formant** shifter (-15%) → **Beat Repeat** (1/8 chance 25%) → **Auto Filter** (bandpass, automated) → **Reverb** (Hall, 1.2s decay) → **Compressor** (4:1, medium attack)\n\n**THE ROLLING GROOVE:** **Drum Rack:** **Kick:** 909 sample, tune -2 semitones • **Hi-hats:** Layer closed + open, swing 12% • **Percussion:** Shaker every 16th, tambourine on off-beats • **Processing:** Bus compression (2:1 ratio, slow attack) + parallel saturation\n\n**FILTER AUTOMATION MAGIC:** **Auto Filter on bass:** Type: Lowpass • **Frequency:** Automate 400Hz to 2kHz over 16 bars, then back • **Resonance:** 1.8 (creates that 'whoomp' sound) • **Key:** Map to Push knob for live performance\n\n**ARRANGEMENT STRUCTURE:** **Bars 1-32:** Kick + bass + minimal hats • **Bars 33-64:** Add vocal chops • **Bars 65-96:** Full arrangement • **Bars 97-128:** Filter breakdown • **Repeat cycle with variations**",
+      abletonMasterclass: "🎛️ **ABLETON TECH HOUSE CONSTRUCTION:**\n\n**THE ROLLING BASS:** **Wavetable:** Basic Shapes → Saw wave • **Unison:** 3 voices, detune +/-12 cents • **Filter:** Lowpass 4-pole, cutoff 800Hz, resonance 1.4, drive +9dB (the 'analog warmth') • **Pitch Bend:** Automate pitch +/-25 cents on off-beats • **Compression:** **Compressor or Glue Compressor** (6:1 ratio, 2ms attack, auto-release) • **Sidechain:** Chain to kick (-3dB, fast attack)\n\n**VOCAL PROCESSING CHAIN:** **Audio track** → **Pitch** device (+3 semitones) → **Formant** shifter (-15%) → **Beat Repeat** (1/8 chance 25%) → **Auto Filter** (bandpass, automated) → **Reverb** (Hall, 1.2s decay) → **Compressor or Glue Compressor** (4:1, medium attack)\n\n**THE ROLLING GROOVE:** **Drum Rack:** **Kick:** 909 sample, tune -2 semitones • **Hi-hats:** Layer closed + open, swing 12% • **Percussion:** Shaker every 16th, tambourine on off-beats • **Processing:** Bus compression (2:1 ratio, slow attack) + parallel saturation\n\n**FILTER AUTOMATION MAGIC:** **Auto Filter on bass:** Type: Lowpass • **Frequency:** Automate 400Hz to 2kHz over 16 bars, then back • **Resonance:** 1.8 (creates that 'whoomp' sound) • **Key:** Map to Push knob for live performance\n\n**ARRANGEMENT STRUCTURE:** **Bars 1-32:** Kick + bass + minimal hats • **Bars 33-64:** Add vocal chops • **Bars 65-96:** Full arrangement • **Bars 97-128:** Filter breakdown • **Repeat cycle with variations**",
       
       producerPsychology: "🧠 **THE PSYCHOLOGY OF UNDERGROUND POP:**\n\n**The Pop Progression Trojan Horse:** Am-F-C-G is the same progression as countless pop hits (Let It Be, Don't Stop Believin'). Your brain recognizes this as 'familiar' even in a techno context. Result: instant accessibility without compromising underground credibility.\n\n**Rolling Groove Addiction:** The 16th note bass pattern with swing creates 'groove lock' - your body synchronizes to the micro-timing variations. The 12% swing is perfectly calibrated: less swing = robotic, more swing = jazz (wrong genre). 12% = irresistible forward momentum.\n\n**Vocal Chop Dopamine Hits:** Processing vocals beyond recognition while keeping emotional content triggers dual-brain response. Your logical brain hears 'interesting sound design,' your emotional brain still responds to human vocal patterns. Double the engagement.\n\n**Filter Automation as Emotional Manipulation:** The 16-bar filter sweep from 400Hz to 2kHz literally guides your energy levels. Low frequencies = relaxed/grounded, higher frequencies = excited/elevated. DJs use this to control dancefloor energy without changing tracks.\n\n**The 6-Minute Attention Span:** Tech house tracks run 6+ minutes because club DJs need mixing time, but radio needs hooks. Cola solves this with vocal hooks every 16 bars - enough repetition for DJs, enough variation for radio programmers.",
       
@@ -292,7 +241,7 @@ export default function ElectronicMusicAnalyzer() {
       
       musicalDNA: "🎵 **KEY:** Minimal/atonal (no harmonic content - pure rhythm and texture) • 🥁 **BPM:** 130.00 (driving techno tempo - fast enough for intensity, controlled enough for precision) • 🎹 **HARMONIC CONTENT:** None (revolutionary - proves melody isn't necessary for emotional impact) • 🥁 **CORE ELEMENTS:** Kick (beats 1,3) + snare (beats 2,4) + micro hi-hat variations • ⏱️ **TIMING VARIATIONS:** Microscopic shifts (+/-1-3ms) create human feel • 🔊 **FREQUENCY FOCUS:** Sub-bass (40-60Hz), snare crack (2-4kHz), nothing else • 🎛️ **ARRANGEMENT:** 64-bar cycles with subtle reverb automation • 📻 **HYPNOTIC SECRET:** Elements never fully repeat - always 99.7% same, 0.3% different",
       
-      abletonMasterclass: "🎛️ **ABLETON MINIMAL TECHNO MASTERY:**\n\n**THE PERFECT KICK:** **Drum Rack:** Layer 3 samples: **Sub:** 909 kick tuned -7 semitones • **Punch:** 909 kick pitched +2 semitones • **Click:** High-frequency transient sample • **Chain:** **EQ Eight** (boost 55Hz +3dB, cut 200Hz -2dB) → **Compressor** (8:1 ratio, 0.1ms attack, auto-release) → **Saturator** (Tube mode, +6dB drive)\n\n**THE SNARE EVOLUTION:** **Impulse:** 909 snare pitched down -7 semitones (creates that signature 'crack') • **Reverb:** **Chromaverb** Synth Hall, 1.8s decay • **Key Automation:** Reverb send 0-40% over 64 bars (creates breathing space illusion) • **Compressor:** Parallel compression (blend 30%) for punch retention\n\n**MICROSCOPIC GROOVE:** **Groove Pool:** Custom groove with tiny variations: kick +1ms, snare -0.5ms, hi-hat +2ms • **Swing:** 2% maximum (minimal techno stays rigid) • **Timing:** Random micro-shifts every 16 bars (+/-3ms maximum)\n\n**THE ARRANGEMENT SECRET:** **Timeline:** Nothing changes for first 2 minutes (builds tension through anticipation) • **Bars 33-64:** Subtle reverb automation begins • **Bars 65-96:** Hi-hat micro-variations introduced • **Bars 97-128:** Snare reverb reaches maximum • **Pro Tip:** Resist every urge to add elements - the emptiness IS the power\n\n**MIXING FOR POWER:** **Master chain:** **EQ Eight** (high-pass 30Hz, boost 60Hz +1dB) → **Compressor** (2:1 ratio, slow attack) → **Limiter** (-0.1dB ceiling) • **Key:** Leave frequencies 100-800Hz almost empty - creates space for the club's natural reverb",
+      abletonMasterclass: "🎛️ **ABLETON MINIMAL TECHNO MASTERY:**\n\n**THE PERFECT KICK:** **Drum Rack:** Layer 3 samples: **Sub:** 909 kick tuned -7 semitones • **Punch:** 909 kick pitched +2 semitones • **Click:** High-frequency transient sample • **Chain:** **EQ Eight** (boost 55Hz +3dB, cut 200Hz -2dB) → **Compressor or Glue Compressor** (8:1 ratio, 0.1ms attack, auto-release) → **Saturator** (Tube mode, +6dB drive)\n\n**THE SNARE EVOLUTION:** **Drum Rack:** 909 snare pitched down -7 semitones (creates that signature 'crack') • **Reverb:** **Hybrid Reverb** Synth Hall, 1.8s decay • **Key Automation:** Reverb send 0-40% over 64 bars (creates breathing space illusion) • **Compressor:** Parallel compression (blend 30%) for punch retention\n\n**MICROSCOPIC GROOVE:** **Groove Pool:** Custom groove with tiny variations: kick +1ms, snare -0.5ms, hi-hat +2ms • **Swing:** 2% maximum (minimal techno stays rigid) • **Timing:** Random micro-shifts every 16 bars (+/-3ms maximum)\n\n**THE ARRANGEMENT SECRET:** **Timeline:** Nothing changes for first 2 minutes (builds tension through anticipation) • **Bars 33-64:** Subtle reverb automation begins • **Bars 65-96:** Hi-hat micro-variations introduced • **Bars 97-128:** Snare reverb reaches maximum • **Pro Tip:** Resist every urge to add elements - the emptiness IS the power\n\n**MIXING FOR POWER:** **Master chain:** **EQ Eight** (high-pass 30Hz, boost 60Hz +1dB) → **Compressor or Glue Compressor** (2:1 ratio, slow attack) → **Limiter** (-0.1dB ceiling) • **Key:** Leave frequencies 100-800Hz almost empty - creates space for the club's natural reverb",
       
       producerPsychology: "🧠 **THE NEUROSCIENCE OF MINIMAL HYPNOSIS:**\n\n**Repetition vs. Variation Paradox:** Your brain craves both familiarity and novelty. Pure repetition = boredom. Pure variation = chaos. Spastik operates at the perfect ratio: 99.7% repetition, 0.3% variation. Just enough change to maintain attention, not enough to break the trance.\n\n**The 'Less is More' Brain Hack:** With minimal elements, your brain has nothing to distract from the groove. In busy arrangements, attention jumps between elements. In minimal techno, 100% focus locks onto the rhythm - creating deeper entrainment and involuntary body movement.\n\n**Micro-Timing and Human Recognition:** The +/-3ms timing variations are below conscious perception but above neural detection threshold. Your brain recognizes these as 'human' timing rather than machine precision. Result: Robotic power with organic soul.\n\n**Reverb as Emotional Manipulation:** The 64-bar reverb automation from 0-40% creates illusion of space expansion and contraction. Low reverb = intimate/claustrophobic, high reverb = expansive/transcendent. Your emotional state follows the spatial perception.\n\n**The 8-Minute Endurance Test:** Minimal techno tracks run 8+ minutes to test commitment. Pop music gives instant gratification. Minimal techno requires patience, focus, dedication. Those who 'get it' experience deeper satisfaction - it's musical natural selection.",
       
@@ -305,12 +254,12 @@ export default function ElectronicMusicAnalyzer() {
       
       musicalDNA: "🎵 **KEY:** F major at A=440Hz (the 'hope and joy' key - naturally uplifting) • 🥁 **BPM:** 125.00 (deep house sweet spot - groove without rush) • 🎹 **CHORD PROGRESSION:** F - Dm - Bb - C (I-vi-IV-V - the 'gospel progression' that triggers emotional familiarity) • 🎤 **VOCAL STYLE:** Gospel runs, melismatic phrases, call-and-response structure • ⏱️ **PHRASING:** 4-bar vocal phrases with 4-bar instrumental responses (church tradition) • 🔊 **BASS FREQUENCY:** F at 87.3Hz (warm, round, supportive - never overpowering vocals) • 🎛️ **DYNAMICS:** Natural vocal dynamics preserved (no over-compression) • 🙏 **SPIRITUAL ELEMENT:** Builds anticipation toward vocal climax = musical 'testimony' structure",
       
-      abletonMasterclass: "🎛️ **ABLETON GOSPEL-HOUSE CONSTRUCTION:**\n\n**THE VOCAL THRONE:** **Audio track:** ZERO pitch correction (preserve natural gospel inflections) • **EQ Eight:** Gentle high-shelf +2dB at 8kHz, notch -2dB at 400Hz (space for bass) • **Compressor:** 2:1 ratio, 30ms attack (preserves transients), auto-release • **Reverb:** **Chromaverb** Hall mode, 2.8s decay, 25% wet (church space simulation) • **Delay:** 1/8 dotted note, 15% feedback, high-cut 6kHz\n\n**SUPPORTIVE BASS:** **Wavetable:** Basic Shapes → Sine wave • Root note F (87.3Hz) • **Filter:** Gentle lowpass 120Hz (removes upper harmonics) • **Compressor:** 4:1 ratio, slow attack (lets transients through) • **Sidechain:** Gentle 4-beat pump, -2dB maximum (subtle, supportive)\n\n**GOSPEL CHORD PADS:** **Wavetable:** Mallets & Bells → Vintage Electric • **Unison:** 3 voices, detune +/-8 cents (analog warmth) • **ADSR:** Attack 1.2s, Sustain 85%, Release 2.5s (organ-like swells) • **EQ:** Roll-off below 200Hz (leave space for bass), gentle boost 1.5kHz (presence)\n\n**DEEP HOUSE GROOVE:** **Drum Rack:** **Kick:** Deep 808 style, tuned to F • **Hats:** Closed on off-beats, open on beat 4 • **Shaker:** Constant 16th notes, low in mix • **Processing:** Bus compression 2:1, slow attack • **Swing:** 8% (subtle groove, not distracting from vocal)\n\n**ARRANGEMENT RESPECT:** **Bars 1-16:** Minimal backing, vocal spotlight • **Bars 17-32:** Add subtle percussion • **Bars 33-48:** Full arrangement enters • **Key:** Always serve the vocal - it's the star, everything else supports",
+      abletonMasterclass: "🎛️ **ABLETON GOSPEL-HOUSE CONSTRUCTION:**\n\n**THE VOCAL THRONE:** **Audio track:** ZERO pitch correction (preserve natural gospel inflections) • **EQ Eight:** Gentle high-shelf +2dB at 8kHz, notch -2dB at 400Hz (space for bass) • **Compressor or Glue Compressor:** 2:1 ratio, 30ms attack (preserves transients), auto-release • **Reverb:** **Hybrid Reverb** Hall mode, 2.8s decay, 25% wet (church space simulation) • **Delay:** 1/8 dotted note, 15% feedback, high-cut 6kHz\n\n**SUPPORTIVE BASS:** **Wavetable:** Basic Shapes → Sine wave • Root note F (87.3Hz) • **Filter:** Gentle lowpass 120Hz (removes upper harmonics) • **Compressor or Glue Compressor:** 4:1 ratio, slow attack (lets transients through) • **Sidechain:** Gentle 4-beat pump, -2dB maximum (subtle, supportive)\n\n**GOSPEL CHORD PADS:** **Wavetable:** Mallets & Bells → Vintage Electric • **Unison:** 3 voices, detune +/-8 cents (analog warmth) • **ADSR:** Attack 1.2s, Sustain 85%, Release 2.5s (organ-like swells) • **EQ:** Roll-off below 200Hz (leave space for bass), gentle boost 1.5kHz (presence)\n\n**DEEP HOUSE GROOVE:** **Drum Rack:** **Kick:** Deep 808 style, tuned to F • **Hats:** Closed on off-beats, open on beat 4 • **Shaker:** Constant 16th notes, low in mix • **Processing:** Bus compression 2:1, slow attack • **Swing:** 8% (subtle groove, not distracting from vocal)\n\n**ARRANGEMENT RESPECT:** **Bars 1-16:** Minimal backing, vocal spotlight • **Bars 17-32:** Add subtle percussion • **Bars 33-48:** Full arrangement enters • **Key:** Always serve the vocal - it's the star, everything else supports",
       
       producerPsychology: "🧠 **THE NEUROSCIENCE OF SPIRITUAL ELECTRONICS:**\n\n**Gospel Progression Familiarity:** F-Dm-Bb-C triggers deep emotional memory even in non-religious listeners. This progression appears in centuries of spiritual music - your brain associates it with 'hope,' 'release,' and 'transcendence' before you consciously recognize it.\n\n**Call-and-Response Dopamine:** The 4-bar vocal + 4-bar instrumental pattern mirrors church call-and-response tradition. Your brain anticipates the 'answer' to each vocal 'call,' releasing dopamine when the musical response arrives. Ancient social bonding pattern applied to electronic music.\n\n**Natural Dynamics vs. Electronic Compression:** Most electronic music compresses vocals heavily. Finally preserves natural dynamics - quiet moments stay quiet, powerful moments soar. Your brain interprets this as 'human authenticity' rather than 'machine processing.'\n\n**Frequency Space Hierarchy:** The arrangement leaves 400-800Hz (vocal warmth zone) almost empty except for the voice. Every other element is EQ'd around the vocal. Result: Julie McKnight's voice feels naturally prominent without aggressive mixing tricks.\n\n**Spiritual Tempo Entrainment:** 125 BPM = 2.08 beats per second = perfect for 'elevated but grounded' feeling. Faster = too frantic for spiritual emotion. Slower = loses dancefloor energy. 125 BPM = transcendent groove sweet spot.",
       
       yourTurn: "🚀 **READY TO TURN INSPIRATION INTO ACTION?**\n\n**STEP 1: Honor the Vocal**\nRecord or find ANY soulful vocal phrase. Mix everything else around it, not over it. Leave 400-800Hz mostly empty except for the voice. Notice how the vocal naturally sits in the mix without fighting for space?\n\n**STEP 2: Build Gospel Harmony**\nProgram the F-Dm-Bb-C progression with warm pad sounds. Add slow attack (1+ seconds) and gentle release. Feel that natural 'hope and resolution' emotion? That's centuries of musical conditioning at work.\n\n**STEP 3: Create Sacred Space**\nAdd reverb that simulates large spaces (halls, churches). Use 2-3 second decay times. The goal: make electronic music feel like it's happening in a sacred, communal space rather than a studio.\n\n**STEP 4: Study Gospel-House Masters**\nAnalyze Masters at Work 'I Can't Get No Sleep', Mood II Swing 'Can't Get Away', Jerome Sydenham 'Sandcastles', Barbara Tucker 'Beautiful People'. Notice how they balance spiritual authenticity with dancefloor functionality.\n\n**CHALLENGE MODE:** Create a track that makes people feel simultaneously uplifted and grounded, spiritual and physical, individual and communal. If it works equally well for personal meditation and group dancing, you've mastered the art of electronic soul music."
-    },
+    }
   };
 
   const extractVideoId = (url) => {
@@ -374,8 +323,6 @@ export default function ElectronicMusicAnalyzer() {
             custom_parameter_1: `${analysisResult.artist} - ${analysisResult.title}`
           });
         }
-        
-        setTimeout(() => setShowEmailCapture(true), 1000);
       } else {
         setError('This demo includes sample analyses for selected electronic tracks. Try one of the sample tracks below!');
         
@@ -407,97 +354,6 @@ export default function ElectronicMusicAnalyzer() {
         track_url: url
       });
     }
-  };
-
-  // SIMPLE BUTTON CLICK EMAIL SUBMIT - NO FORM ELEMENTS
-  const handleEmailSubmit = (e) => {
-    e.preventDefault();
-    
-    console.log('Button clicked, starting email submit process'); // Debug
-    
-    if (!userEmail.trim()) {
-      alert('Please enter your email address');
-      return;
-    }
-    
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(userEmail)) {
-      alert('Please enter a valid email address');
-      return;
-    }
-    
-    // Track email capture attempt
-    if (window.gtag) {
-      window.gtag('event', 'email_capture_attempted', {
-        event_category: 'Conversion',
-        event_label: analysis ? `${analysis.artist} - ${analysis.title}` : 'No track analyzed',
-        custom_parameter_1: analysis ? `${analysis.artist} - ${analysis.title}` : 'none'
-      });
-    }
-    
-    console.log('Email validation passed, creating form'); // Debug
-    setIsSubmittingEmail(true);
-    
-    // Create form programmatically
-    const submitForm = document.createElement('form');
-    submitForm.method = 'POST';
-    submitForm.action = 'https://formspree.io/f/mwpqzgpz';
-    submitForm.target = '_blank';
-    submitForm.style.display = 'none';
-    
-    // Email field
-    const emailField = document.createElement('input');
-    emailField.type = 'email';
-    emailField.name = 'email';
-    emailField.value = userEmail;
-    submitForm.appendChild(emailField);
-    
-    // Source field
-    const sourceField = document.createElement('input');
-    sourceField.type = 'hidden';
-    sourceField.name = 'source';
-    sourceField.value = 'Electronic Music Analyzer';
-    submitForm.appendChild(sourceField);
-    
-    // Track field
-    const trackField = document.createElement('input');
-    trackField.type = 'hidden';
-    trackField.name = 'track';
-    trackField.value = analysis ? `${analysis.artist} - ${analysis.title}` : 'No track analyzed yet';
-    submitForm.appendChild(trackField);
-    
-    console.log('Form created, attempting to submit'); // Debug
-    
-    // Add to DOM and submit
-    document.body.appendChild(submitForm);
-    submitForm.submit();
-    
-    console.log('Form submitted, cleaning up'); // Debug
-    
-    // Track email capture success
-    if (window.gtag) {
-      window.gtag('event', 'email_capture_completed', {
-        event_category: 'Conversion',
-        event_label: analysis ? `${analysis.artist} - ${analysis.title}` : 'No track analyzed',
-        value: 1 // Assign value for conversion tracking
-      });
-    }
-    
-    // Clean up
-    setTimeout(() => {
-      if (document.body.contains(submitForm)) {
-        document.body.removeChild(submitForm);
-      }
-    }, 2000);
-    
-    // Show success
-    setTimeout(() => {
-      setEmailSubmitted(true);
-      setShowEmailCapture(false);
-      setUserEmail('');
-      setIsSubmittingEmail(false);
-    }, 1000);
   };
 
   const shareAnalysis = (platform) => {
@@ -537,7 +393,7 @@ export default function ElectronicMusicAnalyzer() {
             Electronic Music Track Analyzer
           </h1>
           <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-4 md:mb-6 px-4 leading-relaxed">
-            Get actionable insights from your favourite electronic tracks. Paste a YouTube URL and learn the exact techniques, keys, and production secrets you can use tonight.
+            Explore detailed electronic track analysis from deadmau5, Daft Punk, Aphex Twin & more. Deep production breakdowns with actionable Ableton techniques you can use tonight.
           </p>
           
           <nav className="flex justify-center mb-6 md:mb-8 px-4" role="navigation" aria-label="Main navigation">
@@ -545,7 +401,6 @@ export default function ElectronicMusicAnalyzer() {
               <button
                 onClick={() => {
                   setActiveTab('analyzer');
-                  // Track tab switch
                   if (window.gtag) {
                     window.gtag('event', 'tab_switch', {
                       event_category: 'User Interface',
@@ -560,14 +415,12 @@ export default function ElectronicMusicAnalyzer() {
                     : 'text-gray-300 hover:text-white hover:bg-slate-700/50'
                 }`}
                 aria-pressed={activeTab === 'analyzer'}
-                aria-describedby="analyzer-tab-desc"
               >
                 Analyzer
               </button>
               <button
                 onClick={() => {
                   setActiveTab('about');
-                  // Track tab switch
                   if (window.gtag) {
                     window.gtag('event', 'tab_switch', {
                       event_category: 'User Interface',
@@ -582,7 +435,6 @@ export default function ElectronicMusicAnalyzer() {
                     : 'text-gray-300 hover:text-white hover:bg-slate-700/50'
                 }`}
                 aria-pressed={activeTab === 'about'}
-                aria-describedby="about-tab-desc"
               >
                 About
               </button>
@@ -611,16 +463,20 @@ export default function ElectronicMusicAnalyzer() {
 
           {activeTab === 'analyzer' && (
             <>
-              <section className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-4 md:p-6 mb-4 md:mb-6 border border-slate-700/50" aria-labelledby="sample-tracks-heading">
+              <section className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-4 md:p-6 mb-4 md:mb-6 border border-slate-700/50">
                 <div className="flex items-center justify-between mb-4 md:mb-6">
                   <div className="flex items-center">
-                    <Sparkles className="w-5 h-5 md:w-6 md:h-6 mr-2 text-yellow-400" aria-hidden="true" />
-                    <h2 id="sample-tracks-heading" className="text-lg md:text-xl font-bold text-white">Try These Sample Tracks</h2>
+                    <Sparkles className="w-5 h-5 md:w-6 md:h-6 mr-2 text-yellow-400" />
+                    <h2 className="text-lg md:text-xl font-bold text-white">Try These Sample Tracks</h2>
                   </div>
-                  <span className="text-xs md:text-sm text-gray-400 bg-slate-700/50 px-2 md:px-3 py-1 rounded-full" role="status">Demo Version</span>
+                  <span className="text-xs md:text-sm text-gray-400 bg-slate-700/50 px-2 md:px-3 py-1 rounded-full">Demo Version</span>
                 </div>
                 
-                <div ref={carouselRef} className="flex gap-3 md:gap-4 overflow-x-auto pb-3 md:pb-2 track-carousel" role="region" aria-label="Sample electronic music tracks">
+                <p className="text-sm md:text-base text-gray-300 mb-4 text-center">
+                  👆 Click any track below to see the full analysis breakdown
+                </p>
+                
+                <div ref={carouselRef} className="flex gap-3 md:gap-4 overflow-x-auto pb-3 md:pb-2 track-carousel">
                   <style jsx>{`
                     .track-carousel {
                       scrollbar-width: thin;
@@ -641,16 +497,16 @@ export default function ElectronicMusicAnalyzer() {
                       background: #94a3b8;
                     }
                   `}</style>
+                  
                   <div
                     onClick={() => loadSampleTrack("https://youtu.be/dwDns8x3Jb4")}
                     className="flex-shrink-0 bg-slate-700/50 hover:bg-slate-700/70 active:bg-slate-700/80 rounded-xl p-3 md:p-4 cursor-pointer transition-all hover:scale-105 active:scale-95 border border-slate-600/50 min-w-[260px] md:min-w-[280px] touch-manipulation"
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); loadSampleTrack("https://youtu.be/dwDns8x3Jb4"); }}}
-                    aria-label="Analyze deadmau5 - Strobe (Progressive House)"
                   >
                     <div className="flex items-center space-x-3 md:space-x-4">
-                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center" aria-hidden="true">
+                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
                         <Music className="w-6 h-6 md:w-8 md:h-8 text-white" />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -667,10 +523,9 @@ export default function ElectronicMusicAnalyzer() {
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); loadSampleTrack("https://www.youtube.com/watch?v=hJdF8DJ70Dc"); }}}
-                    aria-label="Analyze Daft Punk - Around the World (House)"
                   >
                     <div className="flex items-center space-x-3 md:space-x-4">
-                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center" aria-hidden="true">
+                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                         <Music className="w-6 h-6 md:w-8 md:h-8 text-white" />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -687,10 +542,9 @@ export default function ElectronicMusicAnalyzer() {
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); loadSampleTrack("https://www.youtube.com/watch?v=Ua2loiGHZ38"); }}}
-                    aria-label="Analyze Aphex Twin - Windowlicker (IDM)"
                   >
                     <div className="flex items-center space-x-3 md:space-x-4">
-                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-lg flex items-center justify-center" aria-hidden="true">
+                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-lg flex items-center justify-center">
                         <Music className="w-6 h-6 md:w-8 md:h-8 text-white" />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -707,10 +561,9 @@ export default function ElectronicMusicAnalyzer() {
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); loadSampleTrack("https://youtu.be/q_Uax2Yw48U"); }}}
-                    aria-label="Analyze Bonobo - Heartbreak (Melodic House)"
                   >
                     <div className="flex items-center space-x-3 md:space-x-4">
-                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-pink-500 to-purple-500 rounded-lg flex items-center justify-center" aria-hidden="true">
+                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-pink-500 to-purple-500 rounded-lg flex items-center justify-center">
                         <Music className="w-6 h-6 md:w-8 md:h-8 text-white" />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -727,10 +580,9 @@ export default function ElectronicMusicAnalyzer() {
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); loadSampleTrack("https://youtu.be/0cQTdn8t9TI"); }}}
-                    aria-label="Analyze CamelPhat & Elderbrook - Cola (Tech House)"
                   >
                     <div className="flex items-center space-x-3 md:space-x-4">
-                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center" aria-hidden="true">
+                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
                         <Music className="w-6 h-6 md:w-8 md:h-8 text-white" />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -747,10 +599,9 @@ export default function ElectronicMusicAnalyzer() {
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); loadSampleTrack("https://youtu.be/LSG1jPC8cLw"); }}}
-                    aria-label="Analyze Plastikman - Spastik (Techno)"
                   >
                     <div className="flex items-center space-x-3 md:space-x-4">
-                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-gray-700 to-black rounded-lg flex items-center justify-center" aria-hidden="true">
+                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-gray-700 to-black rounded-lg flex items-center justify-center">
                         <Music className="w-6 h-6 md:w-8 md:h-8 text-white" />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -767,10 +618,9 @@ export default function ElectronicMusicAnalyzer() {
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); loadSampleTrack("https://youtu.be/ZNOKYGqYCoM"); }}}
-                    aria-label="Analyze Kings of Tomorrow - Finally (Deep House)"
                   >
                     <div className="flex items-center space-x-3 md:space-x-4">
-                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-yellow-600 to-amber-700 rounded-lg flex items-center justify-center" aria-hidden="true">
+                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-yellow-600 to-amber-700 rounded-lg flex items-center justify-center">
                         <Music className="w-6 h-6 md:w-8 md:h-8 text-white" />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -783,48 +633,38 @@ export default function ElectronicMusicAnalyzer() {
                 </div>
               </section>
 
-              <section className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-4 md:p-6 mb-6 md:mb-8 border border-slate-700/50" aria-labelledby="track-analysis-heading">
+              <section className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-4 md:p-6 mb-6 md:mb-8 border border-slate-700/50">
                 <div className="flex items-center mb-4">
-                  <Play className="w-5 h-5 md:w-6 md:h-6 mr-2 text-cyan-400" aria-hidden="true" />
-                  <h2 id="track-analysis-heading" className="text-lg md:text-xl font-bold text-white">Track Analysis</h2>
+                  <Play className="w-5 h-5 md:w-6 md:h-6 mr-2 text-cyan-400" />
+                  <h2 className="text-lg md:text-xl font-bold text-white">Track Analysis</h2>
                 </div>
                 
                 <div className="flex flex-col gap-3">
-                  <label htmlFor="youtube-url" className="sr-only">YouTube URL</label>
                   <input
-                    id="youtube-url"
                     type="url"
                     value={youtubeUrl}
                     onChange={(e) => setYoutubeUrl(e.target.value)}
                     placeholder="Paste YouTube URL here..."
-                    className="w-full px-4 py-4 md:py-3 bg-slate-700/50 border border-slate-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50 font-medium text-base md:text-base"
+                    className="w-full px-4 py-4 md:py-3 bg-slate-700/50 border border-slate-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50 font-medium text-base"
                     disabled={isLoading}
-                    aria-describedby="url-help"
                   />
-                  <div id="url-help" className="sr-only">
-                    Enter a YouTube URL to analyze the electronic music track and learn production techniques
-                  </div>
                   <button
                     onClick={analyzeTrack}
                     disabled={isLoading || !youtubeUrl.trim()}
                     className="w-full md:w-auto md:self-start px-8 py-4 md:py-3 bg-cyan-500 hover:bg-cyan-600 disabled:bg-gray-600 text-white font-bold rounded-xl transition-all duration-200 disabled:cursor-not-allowed flex items-center justify-center min-h-[56px] md:min-h-[48px] shadow-lg hover:shadow-xl touch-manipulation"
-                    aria-describedby="analyze-button-desc"
                   >
                     {isLoading ? (
                       <>
-                        <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-b-transparent" aria-hidden="true"></div>
+                        <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-b-transparent"></div>
                         <span className="sr-only">Analyzing track...</span>
                       </>
                     ) : (
                       <>
-                        <Music className="w-5 h-5 mr-2" aria-hidden="true" />
+                        <Music className="w-5 h-5 mr-2" />
                         ANALYZE
                       </>
                     )}
                   </button>
-                  <div id="analyze-button-desc" className="sr-only">
-                    Click to analyze the YouTube track and get detailed production insights
-                  </div>
                 </div>
 
                 {error && (
@@ -840,6 +680,24 @@ export default function ElectronicMusicAnalyzer() {
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <span className="text-white font-medium text-sm md:text-base">Love this analysis?</span>
                       <div className="flex items-center space-x-2 md:space-x-3 overflow-x-auto">
+                        <a
+                          href="https://www.youtube.com/@HeathHolme?sub_confirmation=1"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white rounded-lg transition-colors text-xs md:text-sm whitespace-nowrap touch-manipulation font-medium shadow-lg"
+                          onClick={() => {
+                            if (window.gtag) {
+                              window.gtag('event', 'youtube_subscribe_click', {
+                                event_category: 'User Interaction',
+                                event_label: 'HeathHolme_Channel',
+                                track_analyzed: analysis ? `${analysis.artist} - ${analysis.title}` : 'none'
+                              });
+                            }
+                          }}
+                        >
+                          <Youtube className="w-4 h-4 mr-2" />
+                          Subscribe for More
+                        </a>
                         <button
                           onClick={() => shareAnalysis('reddit')}
                           className="flex items-center px-3 py-2 bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white rounded-lg transition-colors text-xs md:text-sm whitespace-nowrap touch-manipulation"
@@ -905,86 +763,12 @@ export default function ElectronicMusicAnalyzer() {
           )}
         </section>
 
-        {showEmailCapture && !emailSubmitted && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-gradient-to-br from-slate-800 via-blue-900 to-indigo-950 p-1 rounded-2xl max-w-sm w-full border border-slate-700">
-              <div className="bg-slate-900/90 backdrop-blur-lg rounded-2xl p-4 md:p-6">
-                <div className="text-center mb-4 md:mb-6">
-                  <Mail className="w-10 h-10 md:w-12 md:h-12 mx-auto text-cyan-400 mb-3 md:mb-4" />
-                  <h3 className="text-xl md:text-2xl font-bold text-white mb-2">Get Early Access!</h3>
-                  <p className="text-gray-300 text-sm md:text-base">Be the first to know when the full version launches + get exclusive producer tips</p>
-                </div>
-                
-                <div className="flex flex-col gap-3 mb-4">
-                  <input
-                    type="email"
-                    name="email"
-                    value={userEmail}
-                    onChange={(e) => setUserEmail(e.target.value)}
-                    placeholder="Enter your email address"
-                    className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50"
-                    required
-                    disabled={isSubmittingEmail}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !isSubmittingEmail && userEmail.trim()) {
-                        handleEmailSubmit(e);
-                      }
-                    }}
-                  />
-                  
-                  <button
-                    type="button"
-                    onClick={handleEmailSubmit}
-                    disabled={isSubmittingEmail || !userEmail.trim()}
-                    className="px-6 py-4 md:py-3 bg-cyan-500 hover:bg-cyan-600 active:bg-cyan-700 disabled:bg-gray-600 text-white font-bold rounded-lg transition-colors flex items-center justify-center touch-manipulation"
-                  >
-                    {isSubmittingEmail ? (
-                      <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-b-transparent mr-2" />
-                        Submitting...
-                      </>
-                    ) : (
-                      <>
-                        <Mail className="w-5 h-5 mr-2" />
-                        Get Early Access
-                      </>
-                    )}
-                  </button>
-                  
-                  <a 
-                    href={`mailto:heathholme@gmail.com?subject=Music Analyzer Updates&body=Hi Heath,%0D%0A%0D%0APlease add me to the email list for Electronic Music Analyzer updates.%0D%0A%0D%0AMy email: ${userEmail || '[enter-your-email]'}%0D%0A%0D%0AThanks!`}
-                    className="text-xs text-cyan-400 hover:text-cyan-300 text-center"
-                  >
-                    Or email me directly: heathholme@gmail.com
-                  </a>
-                </div>
-                
-                <div className="flex justify-between items-center text-xs md:text-sm">
-                  <span className="text-gray-400">No spam, just production tips</span>
-                  <button
-                    onClick={() => setShowEmailCapture(false)}
-                    className="text-gray-400 hover:text-white py-2 px-1 touch-manipulation"
-                  >
-                    Maybe later
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {emailSubmitted && (
-          <div className="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 max-w-sm">
-            ✅ Thanks! Your email has been submitted successfully.
-          </div>
-        )}
-
         <footer className="text-center mt-8 md:mt-12">
           <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-4 md:p-6 max-w-md mx-auto border border-slate-700/50">
             <p className="text-white text-sm mb-3 md:mb-4">Created by Heath Holme</p>
             <div className="flex justify-center space-x-4 md:space-x-6 mb-4 md:mb-6">
               <a 
-                href="https://www.youtube.com/c/heathholme" 
+                href="https://www.youtube.com/@HeathHolme" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="flex items-center text-cyan-400 hover:text-cyan-300 transition-colors touch-manipulation py-2"
