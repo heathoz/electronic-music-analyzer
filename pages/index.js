@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Music, Play, Heart, Youtube, Instagram, Sparkles, Share2, Linkedin, Copy } from 'lucide-react';
+import { Music, Play, Heart, Youtube, Instagram, Sparkles, Mail, Share2, Linkedin, Copy } from 'lucide-react';
 
 export default function ElectronicMusicAnalyzer() {
   const [youtubeUrl, setYoutubeUrl] = useState('');
@@ -7,7 +7,16 @@ export default function ElectronicMusicAnalyzer() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('analyzer');
+  const [showEmailCapture, setShowEmailCapture] = useState(false);
+  const [emailSubmitted, setEmailSubmitted] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
+  const [isSubmittingEmail, setIsSubmittingEmail] = useState(false);
   const carouselRef = useRef(null);
+
+  // Environment detection - automatically shows right CTA
+  const isVercelProduction = typeof window !== 'undefined' && 
+    (window.location.hostname.includes('electronic-music-analyzer.vercel.app') ||
+     window.location.hostname.includes('vercel.app'));
 
   // Google Analytics 4 Setup - Production Only
   useEffect(() => {
@@ -168,6 +177,16 @@ export default function ElectronicMusicAnalyzer() {
     }
   }, [analysis]);
 
+  // Auto-hide email success message
+  useEffect(() => {
+    if (emailSubmitted) {
+      const timer = setTimeout(() => {
+        setEmailSubmitted(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [emailSubmitted]);
+
   const sampleAnalyses = {
     "https://youtu.be/dwDns8x3Jb4": {
       title: "Strobe",
@@ -323,6 +342,11 @@ export default function ElectronicMusicAnalyzer() {
             custom_parameter_1: `${analysisResult.artist} - ${analysisResult.title}`
           });
         }
+        
+        // Show email capture on Vercel only
+        if (isVercelProduction) {
+          setTimeout(() => setShowEmailCapture(true), 1000);
+        }
       } else {
         setError('This demo includes sample analyses for selected electronic tracks. Try one of the sample tracks below!');
         
@@ -354,6 +378,77 @@ export default function ElectronicMusicAnalyzer() {
         track_url: url
       });
     }
+  };
+
+  // Email capture form handler (Vercel only)
+  const handleEmailSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!userEmail.trim()) {
+      alert('Please enter your email address');
+      return;
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(userEmail)) {
+      alert('Please enter a valid email address');
+      return;
+    }
+    
+    // Track email capture attempt
+    if (window.gtag) {
+      window.gtag('event', 'email_capture_attempted', {
+        event_category: 'Conversion',
+        event_label: analysis ? `${analysis.artist} - ${analysis.title}` : 'No track analyzed',
+        custom_parameter_1: analysis ? `${analysis.artist} - ${analysis.title}` : 'none'
+      });
+    }
+    
+    setIsSubmittingEmail(true);
+    
+    try {
+      // Use fetch API for better error handling
+      const formData = new FormData();
+      formData.append('email', userEmail);
+      formData.append('source', 'Electronic Music Analyzer');
+      formData.append('analyzedTrack', analysis ? `${analysis.artist} - ${analysis.title}` : 'None yet');
+      formData.append('timestamp', new Date().toISOString());
+      
+      const response = await fetch('https://formspree.io/f/mwpqzgpz', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        // Track email capture success
+        if (window.gtag) {
+          window.gtag('event', 'email_capture_completed', {
+            event_category: 'Conversion',
+            event_label: analysis ? `${analysis.artist} - ${analysis.title}` : 'No track analyzed',
+            value: 1
+          });
+        }
+        
+        setEmailSubmitted(true);
+        setShowEmailCapture(false);
+        setUserEmail('');
+      } else {
+        throw new Error('Form submission failed');
+      }
+      
+    } catch (error) {
+      console.error('Form submission error:', error);
+      alert('Thanks for your interest! Please email me directly at: heathholme@gmail.com with subject "Music Analyzer Updates"');
+      setEmailSubmitted(true);
+      setShowEmailCapture(false);
+      setUserEmail('');
+    }
+    
+    setIsSubmittingEmail(false);
   };
 
   const shareAnalysis = (platform) => {
@@ -473,7 +568,7 @@ export default function ElectronicMusicAnalyzer() {
                 </div>
                 
                 <p className="text-sm md:text-base text-gray-300 mb-4 text-center">
-                  👆 Click any track below to see the full analysis breakdown
+                  👇 Click any track below to see the full analysis breakdown
                 </p>
                 
                 <div ref={carouselRef} className="flex gap-3 md:gap-4 overflow-x-auto pb-3 md:pb-2 track-carousel">
@@ -762,6 +857,75 @@ export default function ElectronicMusicAnalyzer() {
             </>
           )}
         </section>
+
+        {/* Email Capture Modal - Vercel Only */}
+        {isVercelProduction && showEmailCapture && !emailSubmitted && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-gradient-to-br from-slate-800 via-blue-900 to-indigo-950 p-1 rounded-2xl max-w-sm w-full border border-slate-700">
+              <div className="bg-slate-900/90 backdrop-blur-lg rounded-2xl p-4 md:p-6">
+                <div className="text-center mb-4 md:mb-6">
+                  <div className="w-10 h-10 md:w-12 md:h-12 mx-auto text-cyan-400 mb-3 md:mb-4 text-2xl">📧</div>
+                  <h3 className="text-xl md:text-2xl font-bold text-white mb-2">Get Early Access!</h3>
+                  <p className="text-gray-300 text-sm md:text-base">Be the first to know when new tracks are analyzed + get exclusive producer tips</p>
+                </div>
+                
+                <form onSubmit={handleEmailSubmit} className="flex flex-col gap-3 mb-4">
+                  <input
+                    type="email"
+                    name="email"
+                    value={userEmail}
+                    onChange={(e) => setUserEmail(e.target.value)}
+                    placeholder="Enter your email address"
+                    className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50"
+                    required
+                    disabled={isSubmittingEmail}
+                  />
+                  
+                  <button
+                    type="submit"
+                    disabled={isSubmittingEmail || !userEmail.trim()}
+                    className="px-6 py-4 md:py-3 bg-cyan-500 hover:bg-cyan-600 active:bg-cyan-700 disabled:bg-gray-600 text-white font-bold rounded-lg transition-colors flex items-center justify-center touch-manipulation"
+                  >
+                    {isSubmittingEmail ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-b-transparent mr-2" />
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        📧 Get Early Access
+                      </>
+                    )}
+                  </button>
+                  
+                  <a 
+                    href={`mailto:heathholme@gmail.com?subject=Music Analyzer Updates&body=Hi Heath,%0D%0A%0D%0APlease add me to the email list for Electronic Music Analyzer updates.%0D%0A%0D%0AMy email: ${userEmail || '[enter-your-email]'}%0D%0A%0D%0AThanks!`}
+                    className="text-xs text-cyan-400 hover:text-cyan-300 text-center"
+                  >
+                    Or email me directly: heathholme@gmail.com
+                  </a>
+                </form>
+                
+                <div className="flex justify-between items-center text-xs md:text-sm">
+                  <span className="text-gray-400">No spam, just production tips</span>
+                  <button
+                    onClick={() => setShowEmailCapture(false)}
+                    className="text-gray-400 hover:text-white py-2 px-1 touch-manipulation"
+                  >
+                    Maybe later
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Email Success Message - Vercel Only */}
+        {isVercelProduction && emailSubmitted && (
+          <div className="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 max-w-sm">
+            ✅ Thanks! Your email has been submitted successfully.
+          </div>
+        )}
 
         <footer className="text-center mt-8 md:mt-12">
           <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-4 md:p-6 max-w-md mx-auto border border-slate-700/50">
