@@ -37,7 +37,7 @@ export default function ElectronicMusicAnalyzer() {
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', '${GA_MEASUREMENT_ID}', {
-        page_title: 'Electronic Music Track Analyzer',
+        page_title: 'Producer Hacks',
         custom_map: {
           'custom_parameter_1': 'track_analyzed'
         }
@@ -50,7 +50,7 @@ export default function ElectronicMusicAnalyzer() {
     setTimeout(() => {
       if (window.gtag) {
         window.gtag('event', 'page_view', {
-          page_title: 'Electronic Music Analyzer Landing',
+          page_title: 'Producer Hacks Landing',
           device_type: deviceType,
           page_location: window.location.href
         });
@@ -68,8 +68,8 @@ export default function ElectronicMusicAnalyzer() {
     const structuredData = {
       "@context": "https://schema.org",
       "@type": "WebApplication",
-      "name": "Electronic Music Track Analyzer",
-      "description": "AI-powered tool to analyze electronic music tracks and learn production techniques from deadmau5, Daft Punk, Aphex Twin, and more.",
+      "name": "Producer Hacks",
+      "description": "Master electronic music production with insider hacks from iconic tracks. Learn the exact techniques, workflows, and psychology behind hits from deadmau5, Daft Punk, Aphex Twin, and more.",
       "url": "https://electronic-music-analyzer.vercel.app",
       "applicationCategory": "MusicApplication",
       "operatingSystem": "Web Browser",
@@ -83,7 +83,7 @@ export default function ElectronicMusicAnalyzer() {
         "name": "Heath Holme",
         "url": "https://www.youtube.com/@HeathHolme"
       },
-      "keywords": "electronic music production, music analysis, deadmau5, daft punk, techno production, house music, music producer tools, DAW techniques, EDM production"
+      "keywords": "producer hacks, electronic music production, music analysis, deadmau5, daft punk, techno production, house music, music producer tools, DAW techniques, EDM production hacks"
     };
 
     let script = document.getElementById('structured-data');
@@ -95,7 +95,7 @@ export default function ElectronicMusicAnalyzer() {
     }
     script.textContent = JSON.stringify(structuredData);
 
-    document.title = "Electronic Music Track Analyzer - Learn Production Secrets from the Pros";
+    document.title = "Producer Hacks - Master Electronic Music Production Secrets";
     
     const updateMeta = (name, content) => {
       let meta = document.querySelector(`meta[name="${name}"]`) || document.querySelector(`meta[property="${name}"]`);
@@ -112,22 +112,22 @@ export default function ElectronicMusicAnalyzer() {
     };
 
     // SEO Meta Tags
-    updateMeta('description', 'Discover the production secrets behind iconic electronic tracks from deadmau5, Daft Punk, Aphex Twin & more. Get step-by-step DAW tutorials and professional techniques.');
-    updateMeta('keywords', 'electronic music production, music analysis, deadmau5 strobe, daft punk production, techno production techniques, house music tutorials, EDM production tools, DAW techniques, music producer education');
+    updateMeta('description', 'Master electronic music production with insider hacks from deadmau5, Daft Punk, Aphex Twin & more. Get step-by-step DAW tutorials and professional techniques.');
+    updateMeta('keywords', 'producer hacks, electronic music production, music analysis, deadmau5 strobe, daft punk production, techno production techniques, house music tutorials, EDM production tools, DAW techniques, music producer education');
     updateMeta('author', 'Heath Holme');
     updateMeta('robots', 'index, follow');
 
     // Open Graph Tags
-    updateMeta('og:title', 'Electronic Music Track Analyzer - Learn Production Secrets');
-    updateMeta('og:description', 'AI-powered tool to analyze iconic electronic tracks and learn professional production techniques. Discover the secrets behind deadmau5, Daft Punk, Aphex Twin & more.');
+    updateMeta('og:title', 'Producer Hacks - Master Electronic Music Production Secrets');
+    updateMeta('og:description', 'Master electronic music production with insider hacks from iconic tracks. Learn the exact techniques, workflows, and psychology behind hits from deadmau5, Daft Punk, Aphex Twin & more.');
     updateMeta('og:type', 'website');
     updateMeta('og:url', 'https://electronic-music-analyzer.vercel.app');
-    updateMeta('og:site_name', 'Electronic Music Track Analyzer');
+    updateMeta('og:site_name', 'Producer Hacks');
 
     // Twitter Card Tags
     updateMeta('twitter:card', 'summary_large_image');
-    updateMeta('twitter:title', 'Electronic Music Track Analyzer - Learn Production Secrets');
-    updateMeta('twitter:description', 'Discover production techniques from iconic electronic tracks. Get step-by-step tutorials for deadmau5, Daft Punk, Aphex Twin & more.');
+    updateMeta('twitter:title', 'Producer Hacks - Master Electronic Music Production Secrets');
+    updateMeta('twitter:description', 'Master electronic music production with insider hacks from iconic tracks. Get step-by-step tutorials for deadmau5, Daft Punk, Aphex Twin & more.');
     updateMeta('twitter:creator', '@heathholmemusic');
 
     return () => {
@@ -411,7 +411,7 @@ export default function ElectronicMusicAnalyzer() {
       // Use fetch API for better error handling
       const formData = new FormData();
       formData.append('email', userEmail);
-      formData.append('source', 'Electronic Music Analyzer');
+      formData.append('source', 'Producer Hacks');
       formData.append('analyzedTrack', analysis ? `${analysis.artist} - ${analysis.title}` : 'None yet');
       formData.append('timestamp', new Date().toISOString());
       
@@ -442,7 +442,7 @@ export default function ElectronicMusicAnalyzer() {
       
     } catch (error) {
       console.error('Form submission error:', error);
-      alert('Thanks for your interest! Please email me directly at: heathholme@gmail.com with subject "Music Analyzer Updates"');
+      alert('Thanks for your interest! Please email me directly at: heathholme@gmail.com with subject "Producer Hacks Updates"');
       setEmailSubmitted(true);
       setShowEmailCapture(false);
       setUserEmail('');
@@ -454,7 +454,7 @@ export default function ElectronicMusicAnalyzer() {
   const shareAnalysis = (platform) => {
     const currentUrl = window.location.href;
     const trackTitle = analysis ? `${analysis.artist} - ${analysis.title}` : 'This Electronic Track';
-    const shareText = `Just discovered the production secrets behind ${trackTitle} using this amazing AI analyzer!`;
+    const shareText = `Just discovered the production secrets behind ${trackTitle} using these amazing Producer Hacks!`;
     
     // Track share button clicks
     if (window.gtag) {
@@ -485,10 +485,10 @@ export default function ElectronicMusicAnalyzer() {
       <div className="container mx-auto px-3 sm:px-4 py-6 md:py-8">
         <header className="text-center mb-6 md:mb-8">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white drop-shadow-lg mb-3 md:mb-4 px-2">
-            Electronic Music Track Analyzer
+            Producer Hacks
           </h1>
           <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-4 md:mb-6 px-4 leading-relaxed">
-            Explore detailed electronic track analysis from deadmau5, Daft Punk, Aphex Twin & more. Deep production breakdowns with actionable Ableton techniques you can use tonight.
+            Master electronic music production with insider hacks from deadmau5, Daft Punk, Aphex Twin & more. Get step-by-step Ableton workflows and pro techniques you can use tonight.
           </p>
           
           <nav className="flex justify-center mb-6 md:mb-8 px-4" role="navigation" aria-label="Main navigation">
@@ -899,7 +899,7 @@ export default function ElectronicMusicAnalyzer() {
                   </button>
                   
                   <a 
-                    href={`mailto:heathholme@gmail.com?subject=Music Analyzer Updates&body=Hi Heath,%0D%0A%0D%0APlease add me to the email list for Electronic Music Analyzer updates.%0D%0A%0D%0AMy email: ${userEmail || '[enter-your-email]'}%0D%0A%0D%0AThanks!`}
+                    href={`mailto:heathholme@gmail.com?subject=Producer Hacks Updates&body=Hi Heath,%0D%0A%0D%0APlease add me to the email list for Producer Hacks updates.%0D%0A%0D%0AMy email: ${userEmail || '[enter-your-email]'}%0D%0A%0D%0AThanks!`}
                     className="text-xs text-cyan-400 hover:text-cyan-300 text-center"
                   >
                     Or email me directly: heathholme@gmail.com
